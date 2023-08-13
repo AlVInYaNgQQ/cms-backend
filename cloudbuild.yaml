@@ -1,0 +1,36 @@
+steps:
+# - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+#   entrypoint: gcloud
+#   args: 
+#     - 'artifacts'
+#     - 'docker'
+#     - 'images'
+#     - 'delete'
+#     - 'us-west1-docker.pkg.dev/$PROJECT_ID/my-test/$_SERVICE_NAME'
+#     - '--delete-tags'
+#     - '--async'
+
+- name: 'gcr.io/cloud-builders/docker'
+# us-west1-docker.pkg.dev/woven-sequence-389701/my-test/app:v1
+  args:
+    - "build"
+    - "-t"
+    - "us-west1-docker.pkg.dev/$PROJECT_ID/cms/backend:default"
+    - "."
+- name: 'gcr.io/cloud-builders/docker'
+  args: 
+    - 'push' 
+    - 'us-west1-docker.pkg.dev/$PROJECT_ID/cms/backend:default'
+    
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args: 
+    - 'run'
+    - 'deploy'
+    - 'cms-backend'
+    - '--image'
+    - 'us-west1-docker.pkg.dev/$PROJECT_ID/cms/backend:default'
+    - '--region'
+    - 'us-central1'
+images: 
+- 'us-west1-docker.pkg.dev/$PROJECT_ID/cms/backend:default'
